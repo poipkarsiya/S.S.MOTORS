@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Add Vehicle - S.S.MOTORS</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            margin: 0; font-family: Arial, sans-serif;
+            background: #f1f5f9; color: #1e293b;
+        }
+        header { background: #111827; color: white; padding: 22px 6%; }
+        header h1 { margin: 0; }
+        .container {
+            max-width: 850px; margin: 35px auto; padding: 30px;
+            background: white; border-radius: 12px;
+            box-shadow: 0 4px 18px #00000012;
+        }
+        .grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
+        }
+        .full { grid-column: 1 / -1; }
+        label { display: block; margin-bottom: 8px; font-weight: bold; }
+        input, select {
+            width: 100%; padding: 12px; border: 1px solid #cbd5e1;
+            border-radius: 6px; font-size: 15px; background: white;
+        }
+        .actions { display: flex; gap: 12px; margin-top: 25px; }
+        button, .back {
+            padding: 13px 20px; border: 0; border-radius: 6px;
+            font-size: 15px; cursor: pointer; text-align: center;
+            text-decoration: none;
+        }
+        button { background: #2563eb; color: white; flex: 1; }
+        .back { background: #e2e8f0; color: #1e293b; }
+        .error {
+            background: #fee2e2; color: #991b1b;
+            padding: 12px; border-radius: 6px; margin-bottom: 18px;
+        }
+        @media (max-width: 600px) {
+            .container { margin: 15px; padding: 20px; }
+            .grid { grid-template-columns: 1fr; }
+            .full { grid-column: auto; }
+            .actions { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+<header><h1>S.S.MOTORS</h1></header>
+
+<main class="container">
+    <h2>Add Vehicle</h2>
+    <p>Register a two-wheeler or three-wheeler.</p>
+
+    <div class="error" th:if="${errorMessage}" th:text="${errorMessage}"></div>
+
+    <form th:action="@{/vehicles/save}" method="post">
+        <div class="grid">
+
+            <div class="full">
+                <label for="customerId">Customer *</label>
+                <select id="customerId" name="customerId" required>
+                    <option value="">-- Select Customer --</option>
+                    <option th:each="customer : ${customers}"
+                            th:value="${customer.id}"
+                            th:text="${customer.fullName}">
+                    </option>
+                </select>
+            </div>
+
+            <div>
+                <label for="vehicleType">Vehicle Category *</label>
+                <select id="vehicleType" name="vehicleType" required>
+                    <option value="">-- Select Category --</option>
+                    <option value="2 Wheeler">2 Wheeler</option>
+                    <option value="3 Wheeler">3 Wheeler</option>
+                </select>
+            </div>
+
+            <div>
+                <label for="registrationNumber">Registration Number *</label>
+                <input id="registrationNumber" name="registrationNumber"
+                       placeholder="e.g. GA01AB1234" maxlength="20" required>
+            </div>
+
+            <div>
+                <label for="model">Model *</label>
+                <input id="model" name="model"
+                       placeholder="e.g. Activa, Scooty Pep, Auto" maxlength="50" required>
+            </div>
+
+            <div>
+                <label for="year">Manufacturing Year</label>
+                <input id="year" name="year" type="number"
+                       min="1950" max="2100" placeholder="e.g. 2019">
+            </div>
+
+            <div class="full">
+                <label for="fuelType">Fuel Type</label>
+                <select id="fuelType" name="fuelType">
+                    <option value="">-- Select Fuel --</option>
+                    <option value="Petrol">Petrol</option>
+                    <option value="Diesel">Diesel</option>
+                    <option value="CNG">CNG</option>
+                    <option value="Electric">Electric</option>
+                    <option value="Hybrid">Hybrid</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="actions">
+            <button type="submit">Save Vehicle</button>
+            <a class="back" th:href="@{/vehicles}">Back to Vehicles</a>
+        </div>
+    </form>
+</main>
+</body>
+</html>

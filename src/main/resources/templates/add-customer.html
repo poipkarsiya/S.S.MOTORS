@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>Add Customer - S.S.MOTORS</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f6f9;
+        }
+
+        .header {
+            background: #111827;
+            color: white;
+            padding: 22px 40px;
+        }
+
+        .header h1 {
+            margin: 0;
+        }
+
+        .container {
+            width: 600px;
+            margin: 40px auto;
+            background: white;
+            padding: 35px;
+            border-radius: 10px;
+            box-shadow: 0 3px 12px #ddd;
+        }
+
+        h2 {
+            margin-top: 0;
+        }
+
+        label {
+            display: block;
+            margin-top: 18px;
+            margin-bottom: 7px;
+            font-weight: bold;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 15px;
+        }
+
+        textarea {
+            height: 100px;
+            resize: vertical;
+        }
+
+        button {
+            width: 100%;
+            margin-top: 25px;
+            padding: 13px;
+            border: none;
+            border-radius: 6px;
+            background: #2563eb;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #1d4ed8;
+        }
+
+        .back {
+            display: block;
+            margin-top: 15px;
+            text-align: center;
+            text-decoration: none;
+            color: #2563eb;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="header">
+
+    <h1>S.S.MOTORS</h1>
+
+</div>
+
+<div class="container">
+
+    <h2>Add Customer</h2>
+
+
+<form th:action="@{/customers/add}" method="post">
+
+    <label>Full Name *</label>
+    <input type="text" name="fullName"
+           placeholder="Enter customer name" required>
+
+    <label>Phone *</label>
+    <input type="tel" name="phone"
+           placeholder="Enter phone number" required>
+
+    <label>Email</label>
+    <input type="email" name="email"
+           placeholder="Enter email address">
+
+    <label>Address</label>
+    <textarea name="address"
+              placeholder="Enter customer address"></textarea>
+
+    <hr style="margin-top: 25px;">
+
+    <label>
+        <input type="checkbox" id="createLogin"
+               name="createLogin" value="true"
+               style="width: auto;">
+        Create User Login
+    </label>
+
+    <div id="loginFields" style="display: none;">
+
+        <label>Username *</label>
+        <input type="text" id="username" name="username"
+               placeholder="Choose a username">
+
+        <label>Password *</label>
+        <input type="password" id="password" name="password"
+               placeholder="Create a password">
+
+        <p>These credentials will be used by the customer to log in.</p>
+    </div>
+
+    <p th:if="${error}" th:text="${error}"
+       style="color: red;"></p>
+
+    <button type="submit">Save Customer</button>
+</form>
+
+<a href="/customers" class="back">← Back to Customers</a>
+
+<script>
+    const checkbox = document.getElementById('createLogin');
+    const loginFields = document.getElementById('loginFields');
+    const username = document.getElementById('username');
+    const password = document.getElementById('password');
+
+    function toggleLoginFields() {
+        loginFields.style.display = checkbox.checked ? 'block' : 'none';
+        username.required = checkbox.checked;
+        password.required = checkbox.checked;
+    }
+
+    checkbox.addEventListener('change', toggleLoginFields);
+    toggleLoginFields();
+</script>
+
+
+</div>
+
+</body>
+
+</html>

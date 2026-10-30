@@ -1,0 +1,141 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Service History - S.S.MOTORS</title>
+
+    <style>
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            padding: 25px;
+            font-family: Arial, sans-serif;
+            background: #f3f5f9;
+            color: #222;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        h2 { color: #173b72; }
+
+        .add-btn {
+            background: #173b72;
+            color: white;
+            padding: 12px 18px;
+            border-radius: 6px;
+            text-decoration: none;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,.06);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 850px;
+        }
+
+        th, td {
+            padding: 13px;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        th {
+            background: #173b72;
+            color: white;
+        }
+
+        tr:hover td { background: #f8faff; }
+
+        .delete-btn {
+            padding: 8px 12px;
+            background: #c62828;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .empty {
+            padding: 25px;
+            text-align: center;
+            color: #666;
+        }
+    </style>
+</head>
+
+<body>
+<div class="container">
+
+    <div class="header">
+        <h2>Service History</h2>
+        <a class="add-btn" th:href="@{/service-history/add}">
+            + Add Service History
+        </a>
+    </div>
+
+    <div class="table-wrapper">
+        <table>
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Vehicle</th>
+                <th>Service Date</th>
+                <th>Service Type</th>
+                <th>Cost (₹)</th>
+                <th>Mechanic Notes</th>
+                <th>Parts Replaced</th>
+                <th>Action</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            <tr th:each="h : ${histories}">
+                <td th:text="${h.id}"></td>
+                <td th:text="${h.vehicle.registrationNumber}"></td>
+                <td th:text="${h.serviceDate}"></td>
+                <td th:text="${h.serviceType ?: '-'}"></td>
+                <td th:text="${h.cost != null ? '₹ ' + h.cost : '-'}"></td>
+                <td th:text="${h.mechanicNotes ?: '-'}"></td>
+                <td th:text="${h.partsReplaced ?: '-'}"></td>
+                <td>
+                    <form th:action="@{/service-history/delete/{id}(id=${h.id})}"
+                          method="post"
+                          onsubmit="return confirm('Delete this service history record?');">
+                        <button class="delete-btn" type="submit">Delete</button>
+                    </form>
+                </td>
+            </tr>
+
+            <tr th:if="${#lists.isEmpty(histories)}">
+                <td colspan="8" class="empty">
+                    No service history records found.
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>
+</body>
+</html>

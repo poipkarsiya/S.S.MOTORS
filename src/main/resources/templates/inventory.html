@@ -1,0 +1,120 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Inventory - S.S.MOTORS</title>
+
+    <style>
+        * { box-sizing: border-box; }
+        body { margin: 0; font-family: Arial, sans-serif; background: #f1f5f9; color: #111827; }
+        header { background: #111827; color: white; padding: 22px 35px; }
+        main { padding: 30px; }
+        .top { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+        .btn { display: inline-block; padding: 11px 16px; background: #2563eb; color: white; text-decoration: none; border: 0; border-radius: 6px; cursor: pointer; }
+        .search { width: 100%; padding: 12px; margin: 18px 0; border: 1px solid #cbd5e1; border-radius: 6px; }
+        .table-wrap { overflow-x: auto; }
+        table { width: 100%; min-width: 850px; background: white; border-collapse: collapse; }
+        th, td { padding: 13px; text-align: left; border-bottom: 1px solid #e2e8f0; }
+        th { background: #e2e8f0; }
+        .low { color: #b91c1c; font-weight: bold; }
+        .edit { color: #2563eb; }
+        .delete { background: #dc2626; color: white; border: 0; padding: 7px 10px; border-radius: 4px; cursor: pointer; }
+        .actions { display: flex; gap: 10px; align-items: center; }
+        .empty { text-align: center; padding: 25px; }
+        @media(max-width:600px) { main { padding: 15px; } }
+    </style>
+</head>
+<body>
+
+<header style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:15px;">
+    <div>
+        <h1>S.S.MOTORS</h1>
+        <span>Inventory &amp; Spare Parts Management</span>
+    </div>
+
+    <a href="/dashboard"
+       style="background:#2563eb; color:white; padding:10px 16px;
+              border-radius:6px; text-decoration:none;">
+        ← Back to Dashboard
+    </a>
+</header>
+
+<main>
+    <div class="top">
+        <h2>Inventory</h2>
+        <a class="btn" th:href="@{/inventory/add}">+ Add Spare Part</a>
+    </div>
+
+    <input id="search" class="search"
+           placeholder="Search by part, number, category or supplier..."
+           oninput="filterItems()">
+
+    <div class="table-wrap">
+        <table id="inventoryTable">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Part Name</th>
+                <th>Part Number</th>
+                <th>Category</th>
+                <th>Quantity</th>
+                <th>Unit Price</th>
+                <th>Supplier</th>
+                <th>Stock Status</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            <tr th:each="item : ${items}">
+                <td th:text="${item.id}"></td>
+                <td th:text="${item.partName}"></td>
+                <td th:text="${item.partNumber ?: '-'}"></td>
+                <td th:text="${item.category ?: '-'}"></td>
+                <td th:text="${item.quantity}"></td>
+                <td th:text="${'₹' + item.unitPrice}"></td>
+                <td th:text="${item.supplier ?: '-'}"></td>
+
+                <td>
+                    <span th:if="${item.lowStock}" class="low">Low Stock</span>
+                    <span th:unless="${item.lowStock}">In Stock</span>
+                </td>
+
+                <td>
+                    <div class="actions">
+                        <a class="edit"
+                           th:href="@{/inventory/edit/{id}(id=${item.id})}">Edit</a>
+
+                        <form th:action="@{/inventory/delete/{id}(id=${item.id})}"
+                              method="post"
+                              onsubmit="return confirm('Delete this spare part?')">
+                            <button class="delete" type="submit">Delete</button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+
+            <tr th:if="${#lists.isEmpty(items)}">
+                <td colspan="9" class="empty">No inventory items added yet.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <p><a th:href="@{/}">← Home</a></p>
+</main>
+
+<script>
+function filterItems() {
+    const query = document.getElementById("search").value.toLowerCase();
+
+    document.querySelectorAll("#inventoryTable tbody tr").forEach(row => {
+        row.style.display = row.innerText.toLowerCase().includes(query) ? "" : "none";
+    });
+}
+</script>
+
+</body>
+</html>

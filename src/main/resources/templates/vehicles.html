@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Vehicles - S.S.MOTORS</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f1f5f9;
+            color: #111827;
+        }
+
+        header {
+            background: #111827;
+            color: white;
+            padding: 22px 35px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+        }
+
+        header h1 {
+            margin: 0;
+        }
+
+        main {
+            padding: 30px;
+        }
+
+        .top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            background: #2563eb;
+            color: white;
+            padding: 12px 18px;
+            text-decoration: none;
+            border-radius: 6px;
+            white-space: nowrap;
+        }
+
+        .btn:hover {
+            background: #1d4ed8;
+        }
+
+        .message {
+            padding: 13px 16px;
+            margin-bottom: 18px;
+            border-radius: 6px;
+        }
+
+        .success {
+            background: #dcfce7;
+            color: #166534;
+            border: 1px solid #86efac;
+        }
+
+        .error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fca5a5;
+        }
+
+        #search {
+            width: 100%;
+            padding: 13px;
+            margin-bottom: 20px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 15px;
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            min-width: 750px;
+            background: white;
+            border-collapse: collapse;
+            box-shadow: 0 2px 8px #e2e8f0;
+        }
+
+        th, td {
+            padding: 14px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        th {
+            background: #e2e8f0;
+        }
+
+        tbody tr:hover {
+            background: #f8fafc;
+        }
+
+        .delete {
+            color: #dc2626;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .delete:hover {
+            text-decoration: underline;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 25px;
+            color: #64748b;
+        }
+
+        @media (max-width: 600px) {
+            header {
+                padding: 18px;
+            }
+
+            header h1 {
+                font-size: 22px;
+            }
+
+            main {
+                padding: 15px;
+            }
+
+            .top {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:15px;">
+    <h1>🔧 S.S.MOTORS</h1>
+    <a href="/dashboard"
+       style="background:#2563eb; color:white; padding:10px 16px;
+              border-radius:6px; text-decoration:none;">
+        ← Back to Dashboard
+    </a>
+</header>
+
+<main>
+
+    <!-- Success message -->
+    <div th:if="${successMessage}"
+         class="message success"
+         th:text="${successMessage}">
+    </div>
+
+    <!-- Error message -->
+    <div th:if="${errorMessage}"
+         class="message error"
+         th:text="${errorMessage}">
+    </div>
+
+    <div class="top">
+        <h2>Registered Vehicles</h2>
+
+        <a class="btn" th:href="@{/vehicles/add}">
+            + Add Vehicle
+        </a>
+    </div>
+
+    <input
+        type="text"
+        id="search"
+        placeholder="Search by registration, category, model or customer..."
+        oninput="filterVehicles()">
+
+    <div class="table-wrap">
+
+        <table id="vehicleTable">
+
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Registration</th>
+                <th>Category</th>
+                <th>Model</th>
+                <th>Year</th>
+                <th>Fuel</th>
+                <th>Customer</th>
+                <th>Action</th>
+            </tr>
+            </thead>
+
+            <tbody>
+
+            <tr th:each="vehicle : ${vehicles}">
+
+                <td th:text="${vehicle.id}"></td>
+
+                <td th:text="${vehicle.registrationNumber != null
+                    ? vehicle.registrationNumber : 'Not provided'}">
+                </td>
+
+                <td th:text="${vehicle.vehicleType != null
+                    ? vehicle.vehicleType : 'Not specified'}">
+                </td>
+
+                <td th:text="${vehicle.model != null
+                    ? vehicle.model : 'Not specified'}">
+                </td>
+
+                <td th:text="${vehicle.year != null
+                    ? vehicle.year : 'Not specified'}">
+                </td>
+
+                <td th:text="${vehicle.fuelType != null
+                    ? vehicle.fuelType : 'Not specified'}">
+                </td>
+
+                <td th:text="${vehicle.customer != null
+                    ? vehicle.customer.fullName : 'Not assigned'}">
+                </td>
+
+                <td>
+                    <a class="delete"
+                       th:href="@{/vehicles/delete/{id}(id=${vehicle.id})}"
+                       onclick="return confirm('Are you sure you want to delete this vehicle?')">
+                        Delete
+                    </a>
+                </td>
+
+            </tr>
+
+            <tr th:if="${#lists.isEmpty(vehicles)}">
+                <td colspan="8" class="empty">
+                    No vehicles registered yet. Click Add Vehicle to register one.
+                </td>
+            </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</main>
+
+<script>
+    function filterVehicles() {
+        const query = document
+            .getElementById("search")
+            .value
+            .toLowerCase();
+
+        document.querySelectorAll("#vehicleTable tbody tr").forEach(row => {
+            if (row.querySelector(".delete")) {
+                row.style.display =
+                    row.innerText.toLowerCase().includes(query) ? "" : "none";
+            } else {
+                const hasVehicleRows = Array.from(
+                    document.querySelectorAll(
+                        "#vehicleTable tbody tr"
+                    )
+                ).some(r => r.querySelector(".delete") &&
+                    r.style.display !== "none");
+
+                row.style.display = hasVehicleRows ? "none" : "";
+            }
+        });
+    }
+</script>
+
+</body>
+</html>

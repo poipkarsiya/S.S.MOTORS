@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S.S. MOTORS - Book a Service</title>
+
+    <style>
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f4f6f9;
+            color: #1f2937;
+        }
+
+        header {
+            background: #172554;
+            color: white;
+            padding: 18px 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 23px;
+            font-weight: bold;
+        }
+
+        .back {
+            color: white;
+            text-decoration: none;
+            background: #2563eb;
+            padding: 10px 15px;
+            border-radius: 7px;
+        }
+
+        main {
+            max-width: 850px;
+            margin: 30px auto;
+            padding: 0 18px 30px;
+        }
+
+        .form-card {
+            background: white;
+            padding: 30px;
+            border-radius: 14px;
+            box-shadow: 0 4px 18px #0000000d;
+            border: 1px solid #e5e7eb;
+        }
+
+        h1 {
+            margin: 0 0 10px;
+            color: #172554;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            color: #64748b;
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+
+        .section-title {
+            margin: 25px 0 16px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e5e7eb;
+            color: #172554;
+            font-size: 18px;
+        }
+
+        .field-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 18px;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 7px;
+            font: inherit;
+            background: white;
+            color: #1f2937;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: 2px solid #bfdbfe;
+            border-color: #2563eb;
+        }
+
+        .hint {
+            font-size: 13px;
+            color: #64748b;
+            line-height: 1.5;
+        }
+
+        .radio-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 18px;
+            margin: 16px 0;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: normal;
+        }
+
+        .radio-option input {
+            width: auto;
+        }
+
+        .new-vehicle {
+            background: #f8fafc;
+            padding: 20px;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 26px;
+        }
+
+        button, .cancel {
+            border: 0;
+            border-radius: 7px;
+            padding: 12px 19px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        button {
+            background: #2563eb;
+            color: white;
+        }
+
+        button:hover { background: #1d4ed8; }
+
+        .cancel {
+            background: #e2e8f0;
+            color: #334155;
+        }
+
+        .message {
+            padding: 12px 15px;
+            margin: 16px 0;
+            border-radius: 7px;
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        @media (max-width: 600px) {
+            header { padding: 15px; }
+            .brand { font-size: 19px; }
+            main { margin-top: 18px; }
+            .form-card { padding: 20px; }
+            .field-grid { grid-template-columns: 1fr; }
+            .full-width { grid-column: auto; }
+        }
+    </style>
+</head>
+
+<body>
+<header>
+    <div class="brand">
+        <span aria-hidden="true">🔧</span>
+        <span>S.S. MOTORS</span>
+    </div>
+    <a class="back" th:href="@{/user-home}">← Dashboard</a>
+</header>
+
+<main>
+    <section class="form-card">
+        <h1>Book a Service</h1>
+        <p class="subtitle">
+            Choose a service for your vehicle. You can select a vehicle already
+            registered to you or add a new one below.
+        </p>
+
+        <div class="message" th:if="${param.error != null}">
+            <span th:if="${param.error[0] == 'vehicle'}">
+                Please select or enter a valid vehicle.
+            </span>
+            <span th:if="${param.error[0] == 'service'}">
+                Please select a valid service.
+            </span>
+            <span th:if="${param.error[0] == 'date'}">
+                The booking date cannot be in the past.
+            </span>
+            <span th:if="${param.error[0] == 'details'}">
+                Please enter all required vehicle details.
+            </span>
+            <span th:if="${param.error[0] == 'save'}">
+                The booking could not be saved. Please check your details and try again.
+            </span>
+        </div>
+
+        <form th:action="@{/user/book-service}" method="post">
+
+            <h2 class="section-title">1. Select Your Vehicle</h2>
+
+            <div class="radio-row">
+                <label class="radio-option">
+                    <input type="radio" name="vehicleChoice"
+                           value="existing" checked
+                           onchange="toggleVehicleFields()">
+                    Existing vehicle
+                </label>
+
+                <label class="radio-option">
+                    <input type="radio" name="vehicleChoice"
+                           value="new"
+                           onchange="toggleVehicleFields()">
+                    Add a new vehicle
+                </label>
+            </div>
+
+            <div id="existingVehicleSection" class="field">
+                <label for="vehicleId">Choose your vehicle</label>
+                <select id="vehicleId" name="vehicleId">
+                    <option value="">-- Select a vehicle --</option>
+                    <option th:each="v : ${vehicles}"
+                            th:value="${v['id']}"
+                            th:text="${v['registration_number'] + ' - ' + v['make'] + ' ' + v['model']}">
+                    </option>
+                </select>
+
+                <p class="hint" th:if="${#lists.isEmpty(vehicles)}">
+                    You have no registered vehicles yet. Choose “Add a new vehicle”.
+                </p>
+            </div>
+
+
+<div id="newVehicleSection" class="new-vehicle" hidden>
+    <div class="field-grid">
+
+        <div class="field full-width">
+            <label for="registrationNumber">Registration Number *</label>
+            <input id="registrationNumber"
+                   name="registrationNumber"
+                   type="text"
+                   maxlength="30"
+                   placeholder="e.g. GA-01-AB-1234">
+        </div>
+
+        <div class="field">
+            <label for="make">Vehicle Company *</label>
+            <input id="make"
+                   name="make"
+                   type="text"
+                   maxlength="100"
+                   placeholder="e.g. Honda">
+        </div>
+
+        <div class="field">
+            <label for="model">Vehicle Name *</label>
+            <input id="model"
+                   name="model"
+                   type="text"
+                   maxlength="100"
+                   placeholder="e.g. Activa">
+        </div>
+
+        <div class="field">
+            <label for="vehicleType">Vehicle Type *</label>
+            <select id="vehicleType" name="vehicleType">
+                <option value="">-- Select type --</option>
+                <option value="2 Wheeler">2 Wheeler</option>
+                <option value="3 Wheeler">3 Wheeler</option>
+            </select>
+        </div>
+
+        <div class="field">
+            <label for="year">Manufacturing Year</label>
+            <input id="year"
+                   name="year"
+                   type="number"
+                   min="1900"
+                   max="2100"
+                   placeholder="e.g. 2023">
+        </div>
+
+    </div>
+</div>
+
+
+            <h2 class="section-title">2. Choose a Service</h2>
+
+            <div class="field">
+                <label for="serviceId">Available Service *</label>
+                <select id="serviceId" name="serviceId" required>
+                    <option value="">-- Select a service --</option>
+                    <option th:each="s : ${services}"
+                            th:value="${s['id']}"
+                            th:text="${s['name'] + ' - ₹' + s['base_price']}">
+                    </option>
+                </select>
+                <p class="hint">
+                    Services are loaded from the S.S. MOTORS service database.
+                </p>
+            </div>
+
+            <h2 class="section-title">3. Booking Details</h2>
+
+            <div class="field-grid">
+                <div class="field">
+                    <label for="bookingDate">Preferred Booking Date *</label>
+                    <input id="bookingDate" name="bookingDate"
+                           type="date" required>
+                </div>
+
+                <div class="field full-width">
+                    <label for="notes">Problem Description / Notes</label>
+                    <textarea id="notes" name="notes" rows="4"
+                              maxlength="1000"
+                              placeholder="Describe the problem or service you need..."></textarea>
+                </div>
+            </div>
+
+            <div class="buttons">
+                <button type="submit">Submit Booking</button>
+                <a class="cancel" th:href="@{/user-home}">Cancel</a>
+            </div>
+        </form>
+    </section>
+</main>
+
+<script>
+    function toggleVehicleFields() {
+        const choice = document.querySelector(
+            'input[name="vehicleChoice"]:checked'
+        ).value;
+
+        const existingSection = document.getElementById("existingVehicleSection");
+        const newSection = document.getElementById("newVehicleSection");
+        const vehicleId = document.getElementById("vehicleId");
+
+        const registration = document.getElementById("registrationNumber");
+        const make = document.getElementById("make");
+        const model = document.getElementById("model");
+        const vehicleType = document.getElementById("vehicleType");
+
+        const isNew = choice === "new";
+
+        existingSection.hidden = isNew;
+        newSection.hidden = !isNew;
+
+        vehicleId.required = !isNew;
+        registration.required = isNew;
+        make.required = isNew;
+        model.required = isNew;
+        vehicleType.required = isNew;
+    }
+
+    const dateInput = document.getElementById("bookingDate");
+    const today = new Date();
+    const localToday = new Date(
+        today.getTime() - today.getTimezoneOffset() * 60000
+    ).toISOString().split("T")[0];
+
+    dateInput.min = localToday;
+
+    toggleVehicleFields();
+</script>
+</body>
+</html>

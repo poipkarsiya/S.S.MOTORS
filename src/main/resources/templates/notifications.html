@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Notifications | S.S.MOTORS</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 25px;
+            font-family: Arial, sans-serif;
+            background: #f3f5f9;
+            color: #263247;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        h1 {
+            margin: 0 0 8px;
+            color: #172554;
+        }
+
+        .subtitle {
+            color: #64748b;
+            margin: 0;
+        }
+
+        .back-btn, .refresh-btn {
+            padding: 11px 17px;
+            border-radius: 7px;
+            text-decoration: none;
+            border: none;
+            background: #1d4ed8;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 18px;
+            margin-bottom: 28px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 22px;
+            border-radius: 12px;
+            box-shadow: 0 3px 12px #0000000b;
+            border-left: 5px solid #2563eb;
+        }
+
+        .stat-card h3 {
+            font-size: 14px;
+            color: #64748b;
+            margin: 0 0 12px;
+        }
+
+        .stat-card .number {
+            font-size: 30px;
+            font-weight: bold;
+        }
+
+        .red {
+            border-left-color: #dc2626;
+        }
+
+        .orange {
+            border-left-color: #ea580c;
+        }
+
+        .green {
+            border-left-color: #16a34a;
+        }
+
+        .section {
+            background: white;
+            border-radius: 12px;
+            padding: 22px;
+            margin-bottom: 25px;
+            box-shadow: 0 3px 12px #0000000b;
+            overflow-x: auto;
+        }
+
+        .section h2 {
+            font-size: 19px;
+            margin: 0 0 18px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 650px;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 13px;
+            border-bottom: 1px solid #e5e7eb;
+            font-size: 14px;
+        }
+
+        th {
+            background: #f8fafc;
+            color: #475569;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 6px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .danger {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .warning {
+            background: #ffedd5;
+            color: #9a3412;
+        }
+
+        .info {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        .success {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .empty {
+            padding: 22px;
+            background: #f0fdf4;
+            color: #166534;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .footer {
+            color: #64748b;
+            font-size: 13px;
+            text-align: center;
+            padding: 10px;
+        }
+
+        @media (max-width: 800px) {
+            .stats {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            body {
+                padding: 15px;
+            }
+        }
+
+        @media (max-width: 450px) {
+            .stats {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+<div class="container">
+
+    <div class="header">
+        <div>
+            <h1>Notifications & Alerts</h1>
+            <p class="subtitle">
+                S.S.MOTORS Garage Management System
+            </p>
+        </div>
+
+        <div>
+            <a th:href="@{/dashboard}" class="back-btn">
+                ← Dashboard
+            </a>
+
+            <a th:href="@{/notifications}" class="refresh-btn">
+                Refresh
+            </a>
+        </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="stats">
+
+        <div class="stat-card">
+            <h3>Total Notifications</h3>
+            <div class="number" th:text="${totalNotifications}">0</div>
+        </div>
+
+        <div class="stat-card red">
+            <h3>Low Stock Alerts</h3>
+            <div class="number" th:text="${lowStockCount}">0</div>
+        </div>
+
+        <div class="stat-card orange">
+            <h3>Overdue Invoices</h3>
+            <div class="number" th:text="${overdueCount}">0</div>
+        </div>
+
+        <div class="stat-card green">
+            <h3>Upcoming Services</h3>
+            <div class="number" th:text="${upcomingCount}">0</div>
+        </div>
+
+    </div>
+
+    <!-- Low Stock Section -->
+    <div class="section">
+        <h2>📦 Low Stock Alerts</h2>
+
+        <div th:if="${#lists.isEmpty(lowStockAlerts)}" class="empty">
+            All inventory items have sufficient stock.
+        </div>
+
+        <table th:unless="${#lists.isEmpty(lowStockAlerts)}">
+            <thead>
+            <tr>
+                <th>Part ID</th>
+                <th>Part Name</th>
+                <th>Part Number</th>
+                <th>Available Quantity</th>
+                <th>Reorder Level</th>
+                <th>Status</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            <tr th:each="item : ${lowStockAlerts}">
+                <td th:text="${item['id']}"></td>
+                <td th:text="${item['part_name']}"></td>
+                <td th:text="${item['part_number'] != null
+                    ? item['part_number'] : '-'}"></td>
+                <td th:text="${item['quantity']}"></td>
+                <td th:text="${item['reorder_level']}"></td>
+                <td>
+                    <span class="badge danger">Low Stock</span>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+        <p>
+            <a th:href="@{/inventory}">Manage Inventory →</a>
+        </p>
+    </div>
+
+    <!-- Overdue Invoice Section -->
+    <div class="section">
+        <h2>🧾 Overdue Invoice Alerts</h2>
+
+        <div th:if="${#lists.isEmpty(overdueAlerts)}" class="empty">
+            No overdue or past-due unpaid invoices found.
+        </div>
+
+        <table th:unless="${#lists.isEmpty(overdueAlerts)}">
+            <thead>
+            <tr>
+                <th>Invoice ID</th>
+                <th>Customer ID</th>
+                <th>Final Amount</th>
+                <th>Due Date</th>
+                <th>Status</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            <tr th:each="invoice : ${overdueAlerts}">
+                <td th:text="${invoice['id']}"></td>
+                <td th:text="${invoice['customer_id']}"></td>
+                <td>
+                    ₹<span th:text="${invoice['final_amount']}"></span>
+                </td>
+                <td th:text="${invoice['due_date']}"></td>
+                <td>
+                    <span class="badge danger"
+                          th:text="${invoice['status']}">
+                    </span>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+        <p>
+            <a th:href="@{/invoices}">Manage Invoices →</a>
+        </p>
+    </div>
+
+    <!-- Upcoming Service Section -->
+    <div class="section">
+        <h2>🔧 Upcoming Service Alerts</h2>
+
+        <div th:if="${#lists.isEmpty(upcomingServices)}" class="empty">
+            No upcoming service completion dates in the next 7 days.
+        </div>
+
+        <table th:unless="${#lists.isEmpty(upcomingServices)}">
+            <thead>
+            <tr>
+                <th>Booking ID</th>
+                <th>Vehicle ID</th>
+                <th>Booking Date</th>
+                <th>Estimated Completion</th>
+                <th>Priority</th>
+                <th>Status</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            <tr th:each="service : ${upcomingServices}">
+                <td th:text="${service['id']}"></td>
+                <td th:text="${service['vehicle_id']}"></td>
+                <td th:text="${service['booking_date']}"></td>
+                <td th:text="${service['estimated_completion']}"></td>
+                <td th:text="${service['priority'] != null
+                    ? service['priority'] : '-'}"></td>
+                <td>
+                    <span class="badge info"
+                          th:text="${service['status'] != null
+                              ? service['status'] : 'Pending'}">
+                    </span>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+        <p>
+            <a th:href="@{/service-bookings}">
+                View Service Bookings →
+            </a>
+        </p>
+    </div>
+
+    <div class="footer">
+        S.S.MOTORS — Garage Management System
+    </div>
+
+</div>
+</body>
+</html>

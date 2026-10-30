@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S.S. MOTORS - User Home</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        :root {
+            --navy: #172554;
+            --blue: #2563eb;
+            --blue-hover: #1d4ed8;
+            --background: #f4f6f9;
+            --text: #1f2937;
+            --muted: #64748b;
+            --white: #ffffff;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            background: var(--background);
+            color: var(--text);
+        }
+
+        header {
+            min-height: 76px;
+            background: var(--navy);
+            color: white;
+            padding: 16px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            box-shadow: 0 3px 12px #00000015;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 23px;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+        }
+
+        .brand-symbol {
+            font-size: 28px;
+        }
+
+        .logout {
+            display: inline-block;
+            background: #dc2626;
+            color: white;
+            padding: 11px 19px;
+            border-radius: 7px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+
+        .logout:hover {
+            background: #b91c1c;
+        }
+
+        main {
+            width: min(1200px, 100%);
+            margin: 32px auto;
+            padding: 0 24px 32px;
+        }
+
+        .welcome {
+            background: white;
+            padding: 30px;
+            border-radius: 14px;
+            box-shadow: 0 3px 14px #0000000d;
+            margin-bottom: 26px;
+            border: 1px solid #e8edf4;
+        }
+
+        .welcome h1 {
+            margin: 0 0 12px;
+            font-size: clamp(25px, 3vw, 34px);
+            color: #172554;
+        }
+
+        .welcome p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 16px;
+            line-height: 1.7;
+        }
+
+        .section-heading {
+            margin: 0 0 18px;
+            font-size: 21px;
+            color: #172554;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            min-height: 215px;
+            background: white;
+            padding: 24px;
+            border-radius: 13px;
+            border: 1px solid #e8edf4;
+            box-shadow: 0 3px 14px #0000000d;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 22px #00000012;
+        }
+
+        .card-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            background: #eff6ff;
+            color: var(--blue);
+            display: grid;
+            place-items: center;
+            font-size: 23px;
+            margin-bottom: 16px;
+        }
+
+        .card h3 {
+            margin: 0 0 12px;
+            font-size: 18px;
+            color: #172554;
+        }
+
+        .card p {
+            margin: 0 0 20px;
+            color: var(--muted);
+            line-height: 1.6;
+            font-size: 14px;
+            flex-grow: 1;
+        }
+
+        .card a {
+            display: inline-block;
+            padding: 11px 15px;
+            background: var(--blue);
+            color: white;
+            text-decoration: none;
+            border-radius: 7px;
+            font-weight: 600;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+
+        .card a:hover {
+            background: var(--blue-hover);
+        }
+
+        .note {
+            margin-top: 24px;
+            padding: 15px 18px;
+            background: #eef2ff;
+            border-radius: 9px;
+            color: #475569;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 1000px) {
+            .grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 600px) {
+            header {
+                padding: 15px 18px;
+            }
+
+            .brand {
+                font-size: 19px;
+            }
+
+            main {
+                margin: 20px auto;
+                padding: 0 14px 24px;
+            }
+
+            .welcome {
+                padding: 22px;
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .card {
+                min-height: 190px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+<header>
+    <div class="brand">
+        <span class="brand-symbol" aria-hidden="true">🔧</span>
+        <span>S.S. MOTORS</span>
+    </div>
+
+    <a class="logout" th:href="@{/logout}">Logout</a>
+</header>
+
+<main>
+    <section class="welcome">
+<h1>
+    Welcome,
+    <span th:text="${session.loggedInUser.fullName}">User</span>!
+</h1>
+        <p>Manage your garage services, vehicles, bookings and invoices from one place.</p>
+    </section>
+
+    <h2 class="section-heading">Your Dashboard</h2>
+
+    <section class="grid">
+        <article class="card">
+            <div class="card-icon" aria-hidden="true">🛠️</div>
+            <h3>Book a Service</h3>
+            <p>Choose a service and select an existing vehicle or add a new one.</p>
+            <a th:href="@{/user/book-service}">Book Service</a>
+        </article>
+
+        <article class="card">
+            <div class="card-icon" aria-hidden="true">🏍️</div>
+            <h3>My Vehicles</h3>
+            <p>View the vehicles registered under your account.</p>
+            <a th:href="@{/user/vehicles}">View Vehicles</a>
+        </article>
+
+        <article class="card">
+            <div class="card-icon" aria-hidden="true">📅</div>
+            <h3>My Bookings</h3>
+            <p>Check your service requests, dates and booking status.</p>
+            <a th:href="@{/user/bookings}">View Bookings</a>
+        </article>
+
+        <article class="card">
+            <div class="card-icon" aria-hidden="true">🧾</div>
+            <h3>My Invoices</h3>
+            <p>Review invoices and payment information associated with your account.</p>
+            <a th:href="@{/user/invoices}">View Invoices</a>
+        </article>
+
+        <article class="card">
+            <div class="card-icon" aria-hidden="true">🤖</div>
+            <h3>AI Vehicle Diagnosis</h3>
+            <p>Get assistance understanding possible vehicle issues.</p>
+            <a th:href="@{/ai-diagnosis}">Open Diagnosis</a>
+        </article>
+    </section>
+
+    <p class="note">
+        🔒 Your dashboard displays your own customer information.
+        Administrative functions are reserved for authorized administrators.
+    </p>
+</main>
+</body>
+</html>

@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S.S.MOTORS | Dashboard</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        body {
+            background: #f4f7fb;
+            color: #1b263b;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 270px;
+            height: 100vh;
+            overflow-y: auto;
+            overflow-x: hidden;
+            background: #101828;
+            color: white;
+            padding: 22px 14px;
+            z-index: 10;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 8px;
+            margin-bottom: 28px;
+        }
+
+        .brand-icon {
+            font-size: 30px;
+            flex-shrink: 0;
+        }
+
+        .brand h2 {
+            font-size: 20px;
+            letter-spacing: 0.4px;
+            white-space: nowrap;
+        }
+
+        .menu-title {
+            color: #98a2b3;
+            font-size: 12px;
+            text-transform: uppercase;
+            margin: 20px 10px 9px;
+        }
+
+        .menu a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+            text-decoration: none;
+            color: #d0d5dd;
+            padding: 12px 11px;
+            margin: 4px 0;
+            border-radius: 8px;
+            line-height: 1.35;
+            overflow-wrap: anywhere;
+            transition: background 0.2s;
+        }
+
+        .menu a:hover,
+        .menu a.active {
+            background: #2563eb;
+            color: white;
+        }
+
+        .menu-icon {
+            width: 25px;
+            flex: 0 0 25px;
+            text-align: center;
+            font-size: 18px;
+        }
+
+        .logout {
+            margin-top: 24px;
+            padding-bottom: 8px;
+        }
+
+        .logout a {
+            display: block;
+            text-align: center;
+            background: #dc2626;
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .logout a:hover {
+            background: #b91c1c;
+        }
+
+        /* Main area */
+        .main {
+            margin-left: 270px;
+            min-height: 100vh;
+            min-width: 0;
+        }
+
+        .topbar {
+            min-height: 75px;
+            background: white;
+            border-bottom: 1px solid #e4e7ec;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 30px;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .topbar h1 {
+            font-size: 25px;
+        }
+
+        .topbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            flex-wrap: wrap;
+        }
+
+        .home-button {
+            display: inline-block;
+            background: #2563eb;
+            color: white;
+            padding: 10px 14px;
+            border-radius: 7px;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .home-button:hover {
+            background: #1d4ed8;
+        }
+
+        .profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .profile-icon {
+            width: 42px;
+            height: 42px;
+            background: #2563eb;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .profile-info strong {
+            display: block;
+        }
+
+        .profile-info span {
+            color: #667085;
+            font-size: 13px;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        /* Welcome section */
+        .welcome {
+            background: linear-gradient(135deg, #1d4ed8, #2563eb);
+            color: white;
+            padding: 28px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+        }
+
+        .welcome h2 {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        .welcome p {
+            color: #dbeafe;
+            line-height: 1.5;
+        }
+
+        .section-title {
+            font-size: 22px;
+            margin-bottom: 18px;
+        }
+
+        /* Overview cards */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 18px;
+            margin-bottom: 34px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 14px;
+            padding: 20px;
+            box-shadow: 0 3px 12px rgba(16, 24, 40, 0.07);
+            min-width: 0;
+        }
+
+        .stat-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .stat-card p {
+            color: #667085;
+            line-height: 1.4;
+        }
+
+        .stat-card h3 {
+            font-size: 27px;
+            margin-top: 14px;
+            overflow-wrap: anywhere;
+        }
+
+        .stat-icon {
+            width: 46px;
+            height: 46px;
+            flex: 0 0 46px;
+            border-radius: 10px;
+            background: #eff6ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+        }
+
+        /* Quick actions */
+        .quick-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 18px;
+            margin-bottom: 34px;
+        }
+
+        .quick-card {
+            display: block;
+            background: white;
+            padding: 22px;
+            border-radius: 14px;
+            text-decoration: none;
+            color: #1b263b;
+            box-shadow: 0 3px 12px rgba(16, 24, 40, 0.07);
+            transition: 0.2s;
+            border: 1px solid transparent;
+            min-width: 0;
+        }
+
+        .quick-card:hover {
+            transform: translateY(-2px);
+            border-color: #2563eb;
+        }
+
+        .quick-icon {
+            font-size: 29px;
+            margin-bottom: 12px;
+        }
+
+        .quick-card h3 {
+            margin-bottom: 7px;
+        }
+
+        .quick-card p {
+            color: #667085;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        /* Recent activity */
+        .activity {
+            background: white;
+            border-radius: 14px;
+            padding: 22px;
+            box-shadow: 0 3px 12px rgba(16, 24, 40, 0.07);
+            overflow-x: auto;
+        }
+
+        .activity-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 540px;
+        }
+
+        .activity-table th,
+        .activity-table td {
+            padding: 13px 12px;
+            border-bottom: 1px solid #eaecf0;
+            text-align: left;
+        }
+
+        .activity-table th {
+            color: #475467;
+            background: #f9fafb;
+            font-size: 13px;
+        }
+
+        .activity-table td {
+            font-size: 14px;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 5px 9px;
+            border-radius: 20px;
+            background: #eff6ff;
+            color: #1d4ed8;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .empty {
+            color: #667085;
+            text-align: center;
+            padding: 28px 12px;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 1250px) {
+            .stats {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .quick-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 760px) {
+            .sidebar {
+                position: relative;
+                width: 100%;
+                height: auto;
+                max-height: none;
+                padding: 15px;
+            }
+
+            .brand {
+                margin-bottom: 15px;
+            }
+
+            .menu {
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 3px 8px;
+            }
+
+            .menu-title {
+                margin-top: 14px;
+            }
+
+            .logout {
+                margin-top: 15px;
+            }
+
+            .main {
+                margin-left: 0;
+            }
+
+            .topbar {
+                padding: 15px 18px;
+            }
+
+            .content {
+                padding: 18px;
+            }
+
+            .stats,
+            .quick-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .welcome h2 {
+                font-size: 23px;
+            }
+        }
+
+        @media (max-width: 420px) {
+            .menu {
+                grid-template-columns: 1fr;
+            }
+
+            .topbar-actions {
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<aside class="sidebar">
+    <div class="brand">
+        <div class="brand-icon">🔧</div>
+        <h2>S.S.MOTORS</h2>
+    </div>
+
+    <div class="menu-title">Main Menu</div>
+
+    <nav class="menu">
+        <a th:href="@{/dashboard}" class="active">
+            <span class="menu-icon">📊</span><span>Dashboard</span>
+        </a>
+
+        <a th:href="@{/customers}">
+            <span class="menu-icon">👥</span><span>Customers</span>
+        </a>
+
+        <a th:href="@{/vehicles}">
+            <span class="menu-icon">🛵</span><span>Vehicles</span>
+        </a>
+
+        <a th:href="@{/services}">
+            <span class="menu-icon">🔧</span><span>Services</span>
+        </a>
+
+        <a th:href="@{/service-bookings}">
+            <span class="menu-icon">📅</span><span>Service Bookings</span>
+        </a>
+
+        <a th:href="@{/inventory}">
+            <span class="menu-icon">📦</span><span>Inventory</span>
+        </a>
+
+        <a th:href="@{/invoices}">
+            <span class="menu-icon">🧾</span><span>Billing &amp; Invoices</span>
+        </a>
+
+        <a th:href="@{/notifications}">
+            <span class="menu-icon">🔔</span><span>Notifications</span>
+        </a>
+    </nav>
+
+    <div class="menu-title">Smart Features</div>
+
+    <nav class="menu">
+        <a th:href="@{/ai-diagnosis}">
+            <span class="menu-icon">🤖</span><span>AI Diagnosis</span>
+        </a>
+
+        <a th:href="@{/reports}">
+            <span class="menu-icon">📈</span><span>Reports &amp; Analytics</span>
+        </a>
+    </nav>
+
+    <div class="logout">
+        <a th:href="@{/logout}">🚪 Logout</a>
+    </div>
+</aside>
+
+<main class="main">
+
+    <header class="topbar">
+        <h1>Dashboard</h1>
+
+        <div class="topbar-actions">
+            <a class="home-button" th:href="@{/}">⌂ Home</a>
+
+            <div class="profile">
+                <div class="profile-icon">SS</div>
+
+                <div class="profile-info">
+                    <strong>S.S. Motors Admin</strong>
+                    <span>Administrator</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section class="content">
+
+        <div class="welcome">
+            <h2>Welcome to S.S.MOTORS 👋</h2>
+            <p>Manage your complete garage operations from one powerful dashboard.</p>
+        </div>
+
+        <h2 class="section-title">Garage Overview</h2>
+
+        <div class="stats">
+
+            <div class="stat-card">
+                <div class="stat-top">
+                    <div>
+                        <p>Total Customers</p>
+                        <h3 th:text="${totalCustomers}">0</h3>
+                    </div>
+                    <div class="stat-icon">👥</div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-top">
+                    <div>
+                        <p>Total Vehicles</p>
+                        <h3 th:text="${totalVehicles}">0</h3>
+                    </div>
+                    <div class="stat-icon">🛵</div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-top">
+                    <div>
+                        <p>Total Bookings</p>
+                        <h3 th:text="${totalBookings}">0</h3>
+                    </div>
+                    <div class="stat-icon">📅</div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-top">
+                    <div>
+                        <p>Total Revenue</p>
+                        <h3 th:text="${'₹' + #numbers.formatDecimal(totalRevenue, 1, 'COMMA', 2, 'POINT')}">₹0.00</h3>
+                    </div>
+                    <div class="stat-icon">💰</div>
+                </div>
+            </div>
+
+        </div>
+
+        <h2 class="section-title">Quick Actions</h2>
+
+        <div class="quick-grid">
+
+            <a th:href="@{/customers}" class="quick-card">
+                <div class="quick-icon">👤</div>
+                <h3>Add Customer</h3>
+                <p>Register a new customer and manage their details.</p>
+            </a>
+
+            <a th:href="@{/vehicles}" class="quick-card">
+                <div class="quick-icon">🛵</div>
+                <h3>Add Vehicle</h3>
+                <p>Register customer vehicles and maintain vehicle information.</p>
+            </a>
+
+            <a th:href="@{/services}" class="quick-card">
+                <div class="quick-icon">🔧</div>
+                <h3>Service Management</h3>
+                <p>Add and manage available garage services.</p>
+            </a>
+
+            <a th:href="@{/service-bookings}" class="quick-card">
+                <div class="quick-icon">📅</div>
+                <h3>New Service Booking</h3>
+                <p>Create a new vehicle service booking and enter its details.</p>
+            </a>
+
+            <a th:href="@{/inventory}" class="quick-card">
+                <div class="quick-icon">📦</div>
+                <h3>Inventory</h3>
+                <p>Manage spare parts and monitor stock levels.</p>
+            </a>
+
+            <a th:href="@{/invoices}" class="quick-card">
+                <div class="quick-icon">🧾</div>
+                <h3>Billing &amp; Invoices</h3>
+                <p>Create invoices, review bills, and manage customer payments.</p>
+            </a>
+
+            <a th:href="@{/notifications}" class="quick-card">
+                <div class="quick-icon">🔔</div>
+                <h3>Notifications</h3>
+                <p>View alerts and reminders.</p>
+            </a>
+
+            <a th:href="@{/ai-diagnosis}" class="quick-card">
+                <div class="quick-icon">🤖</div>
+                <h3>AI Diagnosis</h3>
+                <p>Analyze vehicle symptoms and view possible causes and recommended actions.</p>
+            </a>
+
+            <a th:href="@{/reports}" class="quick-card">
+                <div class="quick-icon">📊</div>
+                <h3>Reports &amp; Analytics</h3>
+                <p>View garage reports, analyze business performance, and track operational activity.</p>
+            </a>
+
+        </div>
+
+        <h2 class="section-title">Recent Activity</h2>
+
+        <div class="activity">
+
+            <div th:if="${#lists.isEmpty(recentActivities)}" class="empty">
+                <div style="font-size:35px; margin-bottom:10px;">📋</div>
+                <strong>No recent activity</strong>
+                <p>Service bookings will appear here after bookings are created.</p>
+            </div>
+
+            <table th:unless="${#lists.isEmpty(recentActivities)}" class="activity-table">
+                <thead>
+                <tr>
+                    <th>Booking ID</th>
+                    <th>Vehicle ID</th>
+                    <th>Booking Date</th>
+                    <th>Status</th>
+                    <th>Created At</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                <tr th:each="activity : ${recentActivities}">
+                    <td th:text="${activity['id']}">1</td>
+                    <td th:text="${activity['vehicle_id']}">1</td>
+                    <td th:text="${activity['booking_date']}">2026-01-01</td>
+                    <td>
+                        <span class="status"
+                              th:text="${activity['status'] != null ? activity['status'] : 'Pending'}">Pending</span>
+                    </td>
+                    <td th:text="${activity['created_at']}">2026-01-01</td>
+                </tr>
+                </tbody>
+            </table>
+
+        </div>
+
+    </section>
+</main>
+
+</body>
+</html>

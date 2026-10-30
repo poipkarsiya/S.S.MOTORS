@@ -1,0 +1,195 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Diagnosis | S.S.MOTORS</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f3f5f9;
+            color: #1f2937;
+        }
+        header {
+            background: #111827;
+            color: white;
+            padding: 22px 6%;
+        }
+        header h1 { margin: 0; font-size: 24px; }
+        header p { margin: 7px 0 0; color: #d1d5db; }
+        main { max-width: 1000px; margin: 30px auto; padding: 0 18px; }
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 22px;
+            box-shadow: 0 3px 14px rgba(0,0,0,.06);
+        }
+        h2 { margin-top: 0; }
+        label {
+            display: block;
+            margin: 15px 0 7px;
+            font-weight: bold;
+        }
+        textarea, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 7px;
+            font: inherit;
+        }
+        textarea { min-height: 130px; resize: vertical; }
+        button {
+            margin-top: 18px;
+            padding: 12px 20px;
+            border: 0;
+            border-radius: 7px;
+            background: #2563eb;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        button:hover { background: #1d4ed8; }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px;
+        }
+        .urgency {
+            display: inline-block;
+            padding: 7px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            background: #e5e7eb;
+        }
+        .CRITICAL, .HIGH { background: #fee2e2; color: #991b1b; }
+        .MEDIUM { background: #fef3c7; color: #92400e; }
+        .LOW { background: #dcfce7; color: #166534; }
+        .error {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 12px;
+            border-radius: 7px;
+            margin-bottom: 15px;
+        }
+        li { margin: 9px 0; line-height: 1.5; }
+        .safety {
+            background: #fff7ed;
+            border-left: 4px solid #ea580c;
+            padding: 15px;
+            border-radius: 5px;
+            line-height: 1.5;
+        }
+        .note { color: #64748b; font-size: 14px; line-height: 1.5; }
+        .back { color: #2563eb; text-decoration: none; }
+        @media (max-width: 650px) {
+            .grid { grid-template-columns: 1fr; }
+            .card { padding: 18px; }
+        }
+    </style>
+</head>
+
+<body>
+<header style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; padding: 20px;">
+    <div>
+        <h1>S.S.MOTORS</h1>
+        <p>AI Diagnosis and Recommendations</p>
+    </div>
+
+
+<a th:if="${session.loggedInUser != null and session.loggedInUser.role == 'USER'}"
+   th:href="@{/user-home}"
+   style="display: inline-block; background: #2563eb; color: white;
+          padding: 10px 16px; border-radius: 6px;
+          text-decoration: none; font-weight: bold;">
+    ← Back to Home
+</a>
+
+<a th:if="${session.loggedInUser != null and session.loggedInUser.role == 'ADMIN'}"
+   th:href="@{/dashboard}"
+   style="display: inline-block; background: #2563eb; color: white;
+          padding: 10px 16px; border-radius: 6px;
+          text-decoration: none; font-weight: bold;">
+    ← Back to Dashboard
+</a>
+
+</header>
+
+<main>
+
+    <section class="card">
+        <h2>Vehicle Symptom Checker</h2>
+        <p class="note">
+            Describe the problem clearly. This tool provides preliminary,
+            rule-based suggestions, not a confirmed mechanical diagnosis.
+        </p>
+
+        <div class="error" th:if="${errorMessage}" th:text="${errorMessage}"></div>
+
+        <form th:action="@{/ai-diagnosis}" method="post">
+            <label for="vehicleType">Vehicle type</label>
+            <select id="vehicleType" name="vehicleType">
+                <option value="2 Wheeler" th:selected="${vehicleType == '2 Wheeler'}">2 Wheeler</option>
+                <option value="3 Wheeler" th:selected="${vehicleType == '3 Wheeler'}">3 Wheeler</option>
+            </select>
+
+            <label for="fuelType">Fuel type</label>
+            <select id="fuelType" name="fuelType">
+                <option value="Petrol" th:selected="${fuelType == 'Petrol'}">Petrol</option>
+                <option value="Electric" th:selected="${fuelType == 'Electric'}">Electric</option>
+                <option value="CNG" th:selected="${fuelType == 'CNG'}">CNG</option>
+            </select>
+
+            <label for="symptoms">Describe the symptoms *</label>
+            <textarea id="symptoms" name="symptoms" required
+                      maxlength="2000"
+                      placeholder="Example: Engine is overheating and coolant is leaking."
+                      th:text="${symptoms}"></textarea>
+
+            <button type="submit">Analyze Symptoms</button>
+        </form>
+    </section>
+
+    <section class="card" th:if="${result != null}">
+        <h2>Diagnosis Results</h2>
+        <h3 th:text="${result.summary}">Preliminary symptom assessment</h3>
+
+        <p>
+            Urgency:
+            <span class="urgency"
+                  th:classappend="${result.urgency}"
+                  th:text="${result.urgency}">MEDIUM</span>
+        </p>
+
+        <div class="grid">
+            <div>
+                <h3>Possible causes</h3>
+                <ul>
+                    <li th:each="cause : ${result.possibleCauses}"
+                        th:text="${cause}"></li>
+                </ul>
+            </div>
+
+            <div>
+                <h3>Recommended checks</h3>
+                <ul>
+                    <li th:each="action : ${result.recommendedActions}"
+                        th:text="${action}"></li>
+                </ul>
+            </div>
+        </div>
+
+        <h3>Safety advice</h3>
+        <div class="safety" th:text="${result.safetyAdvice}"></div>
+
+        <p class="note">
+            These are possible causes, not a confirmed diagnosis.
+            A qualified mechanic must verify the fault before repair.
+        </p>
+    </section>
+</main>
+</body>
+</html>

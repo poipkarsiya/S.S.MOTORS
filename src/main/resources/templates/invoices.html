@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Invoices - S.S.MOTORS</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { margin: 0; font-family: Arial, sans-serif; background: #f1f5f9; color: #172033; }
+        header { background: #111827; color: white; padding: 22px 35px; }
+        header h1 { margin: 0; }
+        main { padding: 30px; }
+        .top { display: flex; justify-content: space-between; align-items: center; gap: 15px; flex-wrap: wrap; }
+        .btn { display: inline-block; padding: 11px 16px; border-radius: 6px; border: 0; text-decoration: none; cursor: pointer; font-size: 14px; }
+        .blue { background: #2563eb; color: white; }
+        .green { background: #15803d; color: white; }
+        .red { background: #dc2626; color: white; }
+        input[type="search"] { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 6px; margin: 18px 0; }
+        .table-wrap { overflow-x: auto; background: white; border-radius: 8px; box-shadow: 0 2px 8px #ddd; }
+        table { width: 100%; border-collapse: collapse; min-width: 950px; }
+        th, td { padding: 13px; border-bottom: 1px solid #e5e7eb; text-align: left; }
+        th { background: #eaf0f8; }
+        .status { padding: 5px 9px; border-radius: 15px; font-size: 12px; font-weight: bold; }
+        .paid { background: #dcfce7; color: #166534; }
+        .unpaid { background: #fef3c7; color: #92400e; }
+        .overdue { background: #fee2e2; color: #991b1b; }
+        .actions { display: flex; gap: 6px; flex-wrap: wrap; }
+        .actions form { margin: 0; }
+        .empty { text-align: center; padding: 25px; }
+        @media(max-width: 600px) { main { padding: 15px; } header { padding: 20px; } }
+    </style>
+</head>
+<body>
+<header style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:15px;">
+    <div>
+        <h1>🔧 S.S.MOTORS</h1>
+        <div>Billing &amp; Invoice Management</div>
+    </div>
+
+    <a href="/dashboard"
+       style="background:#2563eb; color:white; padding:10px 16px;
+              border-radius:6px; text-decoration:none;">
+        ← Back to Dashboard
+    </a>
+</header>
+
+<main>
+    <div class="top">
+        <h2>Invoices</h2>
+        <a href="/invoices/add" class="btn blue">+ Create Invoice</a>
+    </div>
+
+    <input type="search" id="search" placeholder="Search by invoice, customer or status..."
+           oninput="filterInvoices()">
+
+    <div class="table-wrap">
+        <table id="invoiceTable">
+            <thead>
+            <tr>
+                <th>Invoice ID</th>
+                <th>Customer</th>
+                <th>Booking ID</th>
+                <th>Total</th>
+                <th>Tax</th>
+                <th>Discount</th>
+                <th>Final Amount</th>
+                <th>Due Date</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="invoice : ${invoices}">
+                <td th:text="${invoice.id}"></td>
+                <td th:text="${invoice.customer.fullName}"></td>
+                <td th:text="${invoice.booking != null ? invoice.booking.id : '—'}"></td>
+                <td th:text="${invoice.totalAmount}"></td>
+                <td th:text="${invoice.tax}"></td>
+                <td th:text="${invoice.discount}"></td>
+                <td><strong th:text="${invoice.finalAmount}"></strong></td>
+                <td th:text="${invoice.dueDate != null ? invoice.dueDate : '—'}"></td>
+                <td>
+                    <span class="status"
+                          th:classappend="${invoice.status == 'PAID' ? ' paid' : (invoice.status == 'OVERDUE' ? ' overdue' : ' unpaid')}"
+                          th:text="${invoice.status}"></span>
+                </td>
+                <td>
+                    <div class="actions">
+                        <form th:if="${invoice.status != 'PAID'}"
+                              th:action="@{/invoices/pay/{id}(id=${invoice.id})}" method="post">
+                            <button class="btn green" type="submit"
+                                    onclick="return confirm('Mark this invoice as paid?')">Mark Paid</button>
+                        </form>
+                        <form th:if="${invoice.status == 'PAID'}"
+                              th:action="@{/invoices/unpay/{id}(id=${invoice.id})}" method="post">
+                            <button class="btn blue" type="submit"
+                                    onclick="return confirm('Mark this invoice as unpaid?')">Unpay</button>
+                        </form>
+                        <form th:action="@{/invoices/delete/{id}(id=${invoice.id})}" method="post">
+                            <button class="btn red" type="submit"
+                                    onclick="return confirm('Delete this invoice?')">Delete</button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(invoices)}">
+                <td colspan="10" class="empty">No invoices yet. Create your first invoice.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+
+<script>
+function filterInvoices() {
+    const query = document.getElementById('search').value.toLowerCase();
+    document.querySelectorAll('#invoiceTable tbody tr').forEach(row => {
+        row.style.display = row.innerText.toLowerCase().includes(query) ? '' : 'none';
+    });
+}
+</script>
+</body>
+</html>

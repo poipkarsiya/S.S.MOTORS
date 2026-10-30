@@ -1,0 +1,76 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Services - S.S.MOTORS</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f4f6f9; padding: 25px; }
+        .container { max-width: 1100px; margin: auto; background: white; padding: 25px; border-radius: 10px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 12px; border: 1px solid #ddd; text-align: left; }
+        th { background: #23395d; color: white; }
+        .btn { display: inline-block; padding: 8px 12px; margin: 2px; text-decoration: none; border: 0; cursor: pointer; }
+        .add { background: #167d45; color: white; }
+        .edit { background: #e5a000; color: black; }
+        .delete { background: #b42318; color: white; }
+        .error { color: #a00000; background: #ffe5e5; padding: 10px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>S.S.MOTORS - Service Management</h1>
+    
+    <p>
+        <a class="btn"
+        th:href="@{/dashboard}"
+        style="background:#2563eb; color:white; border-radius:6px;">
+        ← Back to Dashboard
+    </a>
+    </p>
+
+    <p class="error" th:if="${param.error != null}">
+        This service may be linked to an existing booking, so it could not be deleted.
+    </p>
+
+    <a class="btn add" th:href="@{/services/add}">+ Add Service</a>
+
+    <table>
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Service Name</th>
+            <th>Description</th>
+            <th>Estimated Hours</th>
+            <th>Base Price</th>
+            <th>Category</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="s : ${services}">
+            <td th:text="${s.id}"></td>
+            <td th:text="${s.name}"></td>
+            <td th:text="${s.description}"></td>
+            <td th:text="${s.estimatedHours}"></td>
+            <td th:text="${s.basePrice}"></td>
+            <td th:text="${s.category}"></td>
+            <td>
+                <a class="btn edit" th:href="@{/services/edit/{id}(id=${s.id})}">Edit</a>
+                <form th:action="@{/services/delete/{id}(id=${s.id})}"
+                      method="post" style="display:inline"
+                      onsubmit="return confirm('Delete this service?')">
+                    <button class="btn delete" type="submit">Delete</button>
+                </form>
+            </td>
+        </tr>
+        <tr th:if="${#lists.isEmpty(services)}">
+            <td colspan="7">No services found. Click Add Service to create one.</td>
+        </tr>
+        </tbody>
+    </table>
+
+</div>
+</body>
+</html>

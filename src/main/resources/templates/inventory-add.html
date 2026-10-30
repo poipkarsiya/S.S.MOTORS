@@ -1,0 +1,281 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title th:text="${pageTitle} + ' - S.S.MOTORS'">
+        Inventory Form
+    </title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f1f5f9;
+            color: #111827;
+        }
+
+        header {
+            background: #111827;
+            color: white;
+            padding: 22px 35px;
+        }
+
+        .card {
+            max-width: 700px;
+            margin: 35px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 3px 12px #ddd;
+        }
+
+        label {
+            display: block;
+            margin: 15px 0 7px;
+            font-weight: bold;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font: inherit;
+        }
+
+        input:focus,
+        textarea:focus {
+            outline: 2px solid #93c5fd;
+            border-color: #2563eb;
+        }
+
+        textarea {
+            min-height: 85px;
+            resize: vertical;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        button {
+            width: 100%;
+            padding: 13px;
+            margin-top: 24px;
+            border: 0;
+            border-radius: 6px;
+            background: #2563eb;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #1d4ed8;
+        }
+
+        .back {
+            display: block;
+            text-align: center;
+            margin-top: 16px;
+            color: #2563eb;
+            text-decoration: none;
+        }
+
+        .error {
+            color: #b91c1c;
+            font-size: 13px;
+            margin-top: 5px;
+        }
+
+        .error-box {
+            padding: 12px;
+            margin: 15px 0;
+            border: 1px solid #fecaca;
+            border-radius: 6px;
+            background: #fef2f2;
+            color: #b91c1c;
+        }
+
+        .required-note {
+            color: #64748b;
+            font-size: 13px;
+        }
+
+        @media (max-width: 600px) {
+            .card {
+                margin: 15px;
+                padding: 20px;
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            header {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>S.S.MOTORS</h1>
+    <span>Inventory &amp; Spare Parts Management</span>
+</header>
+
+<div class="card">
+
+    <h2 th:text="${pageTitle}">Add Spare Part</h2>
+    <p class="required-note">Fields marked * are required.</p>
+
+    <!-- General error from the controller -->
+    <div class="error-box"
+         th:if="${errorMessage != null}"
+         th:text="${errorMessage}">
+        Unable to save the inventory item.
+    </div>
+
+    <!--
+        formAction is supplied by InventoryController.
+        It supports both /inventory/save and /inventory/update/{id}.
+    -->
+    <form th:action="${formAction}"
+          th:object="${item}"
+          method="post">
+
+        <label for="partName">Part Name *</label>
+        <input id="partName"
+               type="text"
+               th:field="*{partName}"
+               maxlength="255"
+               required>
+
+        <div class="error"
+             th:if="${#fields.hasErrors('partName')}"
+             th:errors="*{partName}">
+        </div>
+
+        <div class="grid">
+            <div>
+                <label for="partNumber">Part Number</label>
+                <input id="partNumber"
+                       type="text"
+                       th:field="*{partNumber}">
+                <div class="error"
+                     th:if="${#fields.hasErrors('partNumber')}"
+                     th:errors="*{partNumber}">
+                </div>
+            </div>
+
+            <div>
+                <label for="category">Category</label>
+                <input id="category"
+                       type="text"
+                       th:field="*{category}"
+                       placeholder="Brakes, Engine, Oil...">
+                <div class="error"
+                     th:if="${#fields.hasErrors('category')}"
+                     th:errors="*{category}">
+                </div>
+            </div>
+        </div>
+
+        <div class="grid">
+            <div>
+                <label for="quantity">Quantity *</label>
+                <input id="quantity"
+                       type="number"
+                       th:field="*{quantity}"
+                       min="0"
+                       step="1"
+                       required>
+
+                <div class="error"
+                     th:if="${#fields.hasErrors('quantity')}"
+                     th:errors="*{quantity}">
+                </div>
+            </div>
+
+            <div>
+                <label for="unitPrice">Unit Price (₹) *</label>
+                <input id="unitPrice"
+                       type="number"
+                       th:field="*{unitPrice}"
+                       min="0"
+                       step="0.01"
+                       required>
+
+                <div class="error"
+                     th:if="${#fields.hasErrors('unitPrice')}"
+                     th:errors="*{unitPrice}">
+                </div>
+            </div>
+        </div>
+
+        <div class="grid">
+            <div>
+                <label for="reorderLevel">Low-Stock Alert Level *</label>
+                <input id="reorderLevel"
+                       type="number"
+                       th:field="*{reorderLevel}"
+                       min="0"
+                       step="1"
+                       required>
+
+                <div class="error"
+                     th:if="${#fields.hasErrors('reorderLevel')}"
+                     th:errors="*{reorderLevel}">
+                </div>
+            </div>
+
+            <div>
+                <label for="supplier">Supplier</label>
+                <input id="supplier"
+                       type="text"
+                       th:field="*{supplier}">
+                <div class="error"
+                     th:if="${#fields.hasErrors('supplier')}"
+                     th:errors="*{supplier}">
+                </div>
+            </div>
+        </div>
+
+        <label for="description">Description</label>
+        <textarea id="description"
+                  th:field="*{description}"
+                  placeholder="Enter spare part details...">
+        </textarea>
+
+        <div class="error"
+             th:if="${#fields.hasErrors('description')}"
+             th:errors="*{description}">
+        </div>
+
+        <button type="submit"
+                th:text="${item.id == null ? 'Save Spare Part' : 'Update Spare Part'}">
+            Save Spare Part
+        </button>
+
+    </form>
+
+    <a class="back" th:href="@{/inventory}">
+        ← Back to Inventory
+    </a>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Service Booking - S.S.MOTORS</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f1f5f9;
+            color: #111827;
+        }
+
+        .header {
+            background: #111827;
+            color: white;
+            padding: 20px 35px;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 26px;
+        }
+
+        .container {
+            width: 720px;
+            max-width: 94%;
+            margin: 35px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        h2 {
+            margin-top: 0;
+        }
+
+        .subtitle {
+            color: #64748b;
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin: 17px 0 7px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 15px;
+            background: white;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #2563eb;
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 25px;
+        }
+
+        button, .back {
+            padding: 13px;
+            border: none;
+            border-radius: 6px;
+            font-size: 15px;
+            text-align: center;
+            text-decoration: none;
+        }
+
+        button {
+            flex: 1;
+            background: #2563eb;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #1d4ed8;
+        }
+
+        .back {
+            background: #e2e8f0;
+            color: #111827;
+        }
+
+        .back:hover {
+            background: #cbd5e1;
+        }
+
+        .help {
+            font-size: 12px;
+            color: #64748b;
+            margin-top: 5px;
+        }
+
+        @media (max-width: 600px) {
+            .row {
+                grid-template-columns: 1fr;
+                gap: 0;
+            }
+
+            .container {
+                padding: 22px;
+            }
+
+            .buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="header">
+    <h1>🔧 S.S.MOTORS</h1>
+</div>
+
+<div class="container">
+    <escape><div th:if="${successMessage}" th:text="${successMessage}"
+        style="background:#dcfce7;color:#166534;padding:12px;margin-bottom:15px;border-radius:6px;">
+
+</div>
+
+<div th:if="${errorMessage}" th:text="${errorMessage}"
+style="background:#fee2e2;color:#991b1b;padding:12px;margin-bottom:15px;border-radius:6px;">
+</div></escape>
+
+
+    <h2>New Service Booking</h2>
+
+    <p class="subtitle">
+        Book a service for a bike, scooter or auto-rickshaw.
+    </p>
+
+    <form th:action="@{/service-bookings/save}" method="post">
+
+        <label for="vehicleId">Vehicle *</label>
+
+        <select id="vehicleId" name="vehicleId" required>
+            <option value="">-- Select a two-wheeler or three-wheeler --</option>
+
+            <option th:each="vehicle : ${vehicles}"
+                    th:value="${vehicle.id}"
+                    th:text="${vehicle.registrationNumber
+                        + ' - '
+                        + (vehicle.vehicleType != null ? vehicle.vehicleType : 'Vehicle type not specified')
+                        + ' - '
+                        + (vehicle.make != null ? vehicle.make : '')
+                        + ' '
+                        + (vehicle.model != null ? vehicle.model : '')
+                        + ' - '
+                        + (vehicle.customer != null ? vehicle.customer.fullName : 'No customer')}">
+            </option>
+        </select>
+
+        <p class="help">
+            Only registered two-wheelers and three-wheelers should be available here.
+        </p>
+
+        <label for="serviceId">Service *</label>
+
+        <select id="serviceId" name="serviceId" required>
+            <option value="">-- Select Service --</option>
+
+            <option th:each="service : ${services}"
+                    th:value="${service.id}"
+                    th:text="${service.name + ' - ₹' + service.basePrice}">
+            </option>
+        </select>
+
+        <div class="row">
+            <div>
+                <label for="bookingDate">Booking Date *</label>
+                <input type="date"
+                       id="bookingDate"
+                       name="bookingDate"
+                       required>
+            </div>
+
+            <div>
+                <label for="estimatedCompletion">Estimated Completion</label>
+                <input type="date"
+                       id="estimatedCompletion"
+                       name="estimatedCompletion">
+            </div>
+        </div>
+
+        <div class="row">
+            <div>
+                <label for="priority">Priority</label>
+                <select id="priority" name="priority">
+                    <option value="LOW">Low</option>
+                    <option value="MEDIUM" selected>Medium</option>
+                    <option value="HIGH">High</option>
+                </select>
+            </div>
+
+            <div>
+                <label for="status">Status</label>
+                <select id="status" name="status">
+                    <option value="PENDING" selected>Pending</option>
+                    <option value="IN_PROGRESS">In Progress</option>
+                    <option value="COMPLETED">Completed</option>
+                    <option value="CANCELLED">Cancelled</option>
+                </select>
+            </div>
+        </div>
+        
+        <label for="mechanicId">Mechanic ID (Optional)</label>
+        <input
+        type="number"
+        id="mechanicId"
+        name="mechanicId"
+        min="1"
+        placeholder="Leave blank if not assigned">
+
+        <label for="notes">Problem / Notes</label>
+        <textarea id="notes"
+                  name="notes"
+                  placeholder="Describe the vehicle problem or customer complaint..."></textarea>
+
+        <div class="buttons">
+            <button type="submit">Create Service Booking</button>
+            <a th:href="@{/service-bookings}" class="back">Back to Bookings</a>
+        </div>
+
+    </form>
+
+</div>
+
+<script>
+    // Default booking date to today's local date.
+    const bookingDate = document.getElementById("bookingDate");
+    const today = new Date();
+    const localToday = new Date(
+        today.getTime() - today.getTimezoneOffset() * 60000
+    ).toISOString().slice(0, 10);
+
+    bookingDate.value = localToday;
+    bookingDate.min = localToday;
+
+    const completionDate = document.getElementById("estimatedCompletion");
+
+    bookingDate.addEventListener("change", function () {
+        completionDate.min = bookingDate.value;
+
+        if (completionDate.value &&
+            completionDate.value < bookingDate.value) {
+            completionDate.value = "";
+        }
+    });
+</script>
+
+</body>
+</html>

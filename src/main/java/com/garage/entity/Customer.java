@@ -1,6 +1,6 @@
 
 package com.garage.garagemanagementsystem.entity;
-
+import com.garage.entity.User;
 import jakarta.persistence.*;
 
 @Entity

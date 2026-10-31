@@ -1,6 +1,5 @@
 package com.garage.garagemanagementsystem.controller;
-
-import com.garage.garagemanagementsystem.entity.User;
+import com.garage.entity.User;
 import jakarta.servlet.http.HttpSession;
 
 import org.springframework.dao.DataAccessException;

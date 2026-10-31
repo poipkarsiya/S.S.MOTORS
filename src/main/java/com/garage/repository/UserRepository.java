@@ -1,6 +1,5 @@
 package com.garage.garagemanagementsystem.repository;
-
-import com.garage.garagemanagementsystem.entity.User;
+import com.garage.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

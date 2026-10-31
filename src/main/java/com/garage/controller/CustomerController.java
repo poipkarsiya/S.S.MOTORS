@@ -1,7 +1,7 @@
 package com.garage.garagemanagementsystem.controller;
 
 import com.garage.garagemanagementsystem.entity.Customer;
-import com.garage.garagemanagementsystem.entity.User;
+import com.garage.entity.User;
 import com.garage.garagemanagementsystem.repository.CustomerRepository;
 import com.garage.garagemanagementsystem.repository.UserRepository;
 
